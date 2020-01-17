@@ -55,12 +55,25 @@ def read(id):
 
 @app.route("/<int:id>", methods=["PUT"])
 def update(id):
-    return jsonify({"Response": "UPDATE"})
+    post = Posts.query.get_or_404(id)
+    data = request.json
+    name = data["name"]
+    content = data["content"]
+    post.name = name
+    post.content = content
+    db.session.commit()
+
+    data = {"name": post.name, "content": post.content}
+    return jsonify({"Response": data})
 
 
 @app.route("/<int:id>", methods=["DELETE"])
 def delete(id):
-    return jsonify({"Response": "DELETE"})
+    post = Posts.query.get_or_404(id)
+    db.session.delete(post)
+    db.session.commit()
+
+    return jsonify({"Response": "successfully deleted"})
 
 
 if __name__ == "__main__":
