@@ -1,17 +1,64 @@
-from flask import Flask
+from flask import Flask, request, jsonify, make_response
 from flask_sqlalchemy import SQLAlchemy
 app = Flask(__name__)
 db = SQLAlchemy(app)
+app.config.from_pyfile("config.py")
+
+
+@app.errorhandler(404)
+def error_404(error):
+    return make_response(jsonify({'error': 'Not found'}), 404)
+
+
+@app.errorhandler(405)
+def error_405(error):
+    return make_response(jsonify({'error': 'Not Allowed'}), 405)
+
+
+class Posts(db.Model):
+    id = db.Column(db.Integer(), primary_key=True)
+    name = db.Column(db.String())
+    content = db.Column(db.String())
+
+    def __repr__(self):
+        return f"{self.id}=>{self.name}"
 
 
 @app.route("/", methods=["GET"])
 def index():
-    return "hello"
+    posts = Posts.query.all()
+    data = {}
+    for post in posts:
+        data[post.id] = {"name": post.name, "content": post.content}
+
+    return jsonify(data)
 
 
 @app.route("/", methods=["POST"])
-def post():
-    return "hello"
+def create():
+    data = request.json
+    name = data["name"]
+    content = data["content"]
+    post = Posts(name=name, content=content)
+
+    db.session.add(post)
+    db.session.commit()
+    return jsonify({"Response": "successfully created"})
+
+
+@app.route("/<int:id>", methods=["GET"])
+def read(id):
+    return jsonify({"Response": "READ"})
+
+
+@app.route("/<int:id>", methods=["PUT"])
+def update(id):
+    return jsonify({"Response": "UPDATE"})
+
+
+@app.route("/<int:id>", methods=["DELETE"])
+def delete(id):
+    return jsonify({"Response": "DELETE"})
 
 
 if __name__ == "__main__":
