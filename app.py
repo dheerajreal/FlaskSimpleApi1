@@ -48,7 +48,9 @@ def create():
 
 @app.route("/<int:id>", methods=["GET"])
 def read(id):
-    return jsonify({"Response": "READ"})
+    post = Posts.query.get_or_404(id)
+    data = {"name": post.name, "content": post.content}
+    return jsonify({"Response": data})
 
 
 @app.route("/<int:id>", methods=["PUT"])
