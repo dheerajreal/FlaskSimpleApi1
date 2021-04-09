@@ -2,9 +2,9 @@ from flask import Flask, jsonify, make_response, request
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
-db = SQLAlchemy(app)
 app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///db.db"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db = SQLAlchemy(app)
 
 
 @app.errorhandler(404)
@@ -80,5 +80,5 @@ def delete(id):
 
 if __name__ == "__main__":
     # to create tables
-    # db.create_all()
+    db.create_all()
     app.run(debug=True)
